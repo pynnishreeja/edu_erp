@@ -1,115 +1,188 @@
 import React, { useState } from "react";
 
-const LoginPage = ({ onLogin }) => {
-  const [email, setEmail] = useState("");
+export default function LoginPage({ onLogin }) {
+  const [role, setRole] = useState("student");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (email === "admin@example.com" && password === "admin123") {
-      onLogin(true);
-    } else {
-      setError("Invalid email or password. Please try again.");
+  // CAPTCHA
+  const generateCaptcha = () => {
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    let c = "";
+    for (let i = 0; i < 6; i++) c += chars[Math.floor(Math.random() * chars.length)];
+    return c;
+  };
+
+  const [captcha, setCaptcha] = useState(generateCaptcha());
+  const [captchaInput, setCaptchaInput] = useState("");
+  const [captchaError, setCaptchaError] = useState("");
+
+  const handleLogin = () => {
+    // CAPTCHA validation
+    if (captchaInput.trim().toUpperCase() !== captcha) {
+      setCaptchaError("Captcha didn't match. Try again!");
+      setCaptcha(generateCaptcha());
+      setCaptchaInput("");
+      return;
+    }
+
+    // Clear error if matched
+    setCaptchaError("");
+
+    // YOUR login logic (dummy login)
+    if (role === "student") {
+      onLogin({ role: "student" });
+    } else if (role === "teacher") {
+      onLogin({ role: "teacher" });
     }
   };
 
-  // Professional, formal styling
-  const containerStyle = {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    height: "100vh",
-    background: "linear-gradient(135deg, #f0f4f8, #d9e2ec)",
-    fontFamily: "Segoe UI, Roboto, sans-serif",
-  };
-
-  const cardStyle = {
-    background: "#fff",
-    padding: "40px",
-    borderRadius: "12px",
-    boxShadow: "0 6px 18px rgba(0,0,0,0.1)",
-    width: "380px",
-    textAlign: "center",
-  };
-
-  const inputStyle = {
-    width: "100%",
-    padding: "12px",
-    margin: "10px 0",
-    borderRadius: "6px",
-    border: "1px solid #ccc",
-    fontSize: "15px",
-    outline: "none",
-    boxSizing: "border-box",
-  };
-
-  const buttonStyle = {
-    width: "100%",
-    padding: "12px",
-    marginTop: "16px",
-    border: "none",
-    borderRadius: "6px",
-    backgroundColor: "#1e3a8a", // navy blue
-    color: "#fff",
-    fontSize: "16px",
-    fontWeight: "600",
-    cursor: "pointer",
-    transition: "background 0.3s ease",
-  };
-
-  const headingStyle = {
-    fontSize: "24px",
-    marginBottom: "20px",
-    color: "#1e3a8a",
-    fontWeight: "700",
-  };
-
-  const errorStyle = {
-    color: "red",
-    marginBottom: "10px",
-    fontSize: "14px",
-  };
-
-  const infoStyle = {
-    marginTop: "15px",
-    fontSize: "14px",
-    color: "#555",
-  };
-
   return (
-    <div style={containerStyle}>
-      <div style={cardStyle}>
-        <h2 style={headingStyle}>ERP Login</h2>
-        {error && <p style={errorStyle}>{error}</p>}
-        <form onSubmit={handleSubmit}>
+    <div
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "linear-gradient(135deg, #4f46e5, #14b8a6)",
+        fontFamily: "Inter",
+        padding: 20,
+      }}
+    >
+      <div
+        style={{
+          background: "#ffffff",
+          padding: 30,
+          borderRadius: 16,
+          width: "min(380px, 90vw)",
+          boxShadow: "0 10px 30px rgba(0,0,0,0.15)",
+        }}
+      >
+        <h2 style={{ fontWeight: 800, marginBottom: 20, textAlign: "center" }}>
+          ERP Login
+        </h2>
+
+        {/* Select Role */}
+        <select
+          style={{
+            width: "100%",
+            padding: 12,
+            marginBottom: 12,
+            borderRadius: 10,
+            border: "1px solid #e5e7eb",
+          }}
+          value={role}
+          onChange={(e) => setRole(e.target.value)}
+        >
+          <option value="student">Student Login</option>
+          <option value="teacher">Teacher Login</option>
+        </select>
+
+        <input
+          style={{
+            width: "100%",
+            padding: 12,
+            marginBottom: 12,
+            borderRadius: 10,
+            border: "1px solid #e5e7eb",
+          }}
+          placeholder="Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+        />
+
+        <input
+          type="password"
+          style={{
+            width: "100%",
+            padding: 12,
+            marginBottom: 12,
+            borderRadius: 10,
+            border: "1px solid #e5e7eb",
+          }}
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+
+        {/* CAPTCHA */}
+        <div style={{ marginBottom: 10 }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              marginBottom: 8,
+              alignItems: "center",
+            }}
+          >
+            <div
+              style={{
+                fontSize: 28,
+                fontWeight: 900,
+                letterSpacing: 4,
+                background: "#f1f5f9",
+                padding: "8px 12px",
+                borderRadius: 10,
+                border: "1px solid #e5e7eb",
+                userSelect: "none",
+                fontFamily: "monospace",
+              }}
+            >
+              {captcha}
+            </div>
+
+            <button
+              onClick={() => setCaptcha(generateCaptcha())}
+              style={{
+                background: "#4f46e5",
+                color: "#fff",
+                padding: "8px 12px",
+                borderRadius: 10,
+                border: "none",
+                cursor: "pointer",
+                fontWeight: 700,
+              }}
+            >
+              Refresh
+            </button>
+          </div>
+
           <input
-            type="email"
-            placeholder="Enter Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            style={inputStyle}
-            required
+            placeholder="Enter Captcha"
+            value={captchaInput}
+            onChange={(e) => setCaptchaInput(e.target.value)}
+            style={{
+              width: "100%",
+              padding: 10,
+              borderRadius: 10,
+              border: "1px solid #e5e7eb",
+            }}
           />
-          <input
-            type="password"
-            placeholder="Enter Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            style={inputStyle}
-            required
-          />
-          <button type="submit" style={buttonStyle}>
-            Login
-          </button>
-        </form>
-        <p style={infoStyle}>
-          Use <b>admin@example.com</b> / <b>admin123</b> for access
-        </p>
+
+          {captchaError && (
+            <div style={{ color: "red", marginTop: 6, fontSize: 14 }}>
+              {captchaError}
+            </div>
+          )}
+        </div>
+
+        <button
+          onClick={handleLogin}
+          style={{
+            width: "100%",
+            padding: 12,
+            background: "linear-gradient(90deg,#4f46e5,#14b8a6)",
+            color: "#fff",
+            border: "none",
+            borderRadius: 10,
+            cursor: "pointer",
+            fontWeight: 800,
+            marginTop: 10,
+          }}
+        >
+          Login
+        </button>
       </div>
     </div>
   );
-};
-
-export default LoginPage;
-
+}

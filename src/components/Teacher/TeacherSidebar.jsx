@@ -1,4 +1,4 @@
-// Sidebar.jsx
+// src/teacher/TeacherSidebar.jsx
 import { useState, useMemo } from "react";
 import { NavLink } from "react-router-dom";
 
@@ -12,35 +12,16 @@ const C = {
 };
 
 const NAV = [
-  { to: "/", label: "Dashboard", icon: "▦" },
-  { to: "/attendance", label: "Attendance", icon: "🗓" },
-  { to: "/marks", label: "Marks", icon: "🎯" },
-  { to: "/fees", label: "Fees", icon: "💳" },
-  { to: "/timetable", label: "Timetable", icon: "⏱" },
-  { to: "/notices", label: "Notices", icon: "💬" },
-  { to: "/profile", label: "Profile", icon: "👤" },
-  { to: "/assignments", label: "Assignments", icon: "📝" },
+  { to: "/teacher", label: "Dashboard", icon: "📊" },
+  { to: "/teacher/assignments", label: "Assignments", icon: "📝" },
+  { to: "/teacher/timetable", label: "Timetable", icon: "📅" },
 ];
 
-export default function Sidebar({ onLogout }) {
-  // collapsed state persisted in localStorage
-  const [collapsed, setCollapsed] = useState(() => {
-    if (typeof window === "undefined") return false;
-    return localStorage.getItem("erp_sidebar_collapsed") === "true";
-  });
+export default function TeacherSidebar({ onLogout }) {
+  const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const width = useMemo(() => (collapsed ? 72 : 260), [collapsed]);
-
-  const toggleCollapsed = () => {
-    setCollapsed((prev) => {
-      const next = !prev;
-      if (typeof window !== "undefined") {
-        localStorage.setItem("erp_sidebar_collapsed", String(next));
-      }
-      return next;
-    });
-  };
 
   const Item = ({ to, icon, label }) => (
     <NavLink
@@ -79,7 +60,7 @@ export default function Sidebar({ onLogout }) {
 
   return (
     <>
-      {/* Mobile menu toggle */}
+      {/* Mobile hamburger */}
       <button
         onClick={() => setMobileOpen((v) => !v)}
         style={{
@@ -98,9 +79,9 @@ export default function Sidebar({ onLogout }) {
         ☰
       </button>
 
-      {/* Collapse toggle */}
+      {/* Collapse button (desktop) */}
       <button
-        onClick={toggleCollapsed}
+        onClick={() => setCollapsed((v) => !v)}
         style={{
           position: "fixed",
           top: 14,
@@ -118,7 +99,6 @@ export default function Sidebar({ onLogout }) {
         {collapsed ? "➡" : "⬅"}
       </button>
 
-      {/* Sidebar itself */}
       <aside
         style={{
           position: "fixed",
@@ -135,7 +115,6 @@ export default function Sidebar({ onLogout }) {
         }}
         className={mobileOpen ? "sidebar-open" : "sidebar-closed"}
       >
-        {/* Logo / header */}
         <div
           style={{
             display: "flex",
@@ -148,9 +127,9 @@ export default function Sidebar({ onLogout }) {
         >
           <div
             style={{
-              width: 36,
-              height: 36,
-              borderRadius: 10,
+              width: 40,
+              height: 40,
+              borderRadius: 12,
               background: C.grad,
               display: "grid",
               placeItems: "center",
@@ -158,7 +137,7 @@ export default function Sidebar({ onLogout }) {
               fontWeight: 900,
             }}
           >
-            🎓
+            🧑‍🏫
           </div>
           {!collapsed && (
             <div>
@@ -169,7 +148,7 @@ export default function Sidebar({ onLogout }) {
                   lineHeight: 1,
                 }}
               >
-                College ERP
+                Teacher ERP
               </div>
               <div
                 style={{
@@ -178,20 +157,18 @@ export default function Sidebar({ onLogout }) {
                   marginTop: 2,
                 }}
               >
-                Student Portal
+                Faculty Portal
               </div>
             </div>
           )}
         </div>
 
-        {/* Nav items */}
         <nav style={{ paddingTop: 6 }}>
           {NAV.map((n) => (
             <Item key={n.to} {...n} />
           ))}
         </nav>
 
-        {/* Bottom info + logout */}
         {!collapsed && (
           <div
             style={{
@@ -201,31 +178,33 @@ export default function Sidebar({ onLogout }) {
               right: 12,
               color: C.sub,
               fontSize: 12,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              gap: 10,
             }}
           >
+            <span>Faculty panel</span>
             {onLogout && (
               <button
                 onClick={onLogout}
                 style={{
-                  width: "100%",
-                  marginBottom: 8,
-                  padding: "8px 10px",
-                  borderRadius: 10,
                   border: `1px solid ${C.border}`,
-                  background: "#fff",
+                  borderRadius: 999,
+                  padding: "6px 10px",
+                  fontSize: 11,
+                  background: "#f9fafb",
                   cursor: "pointer",
                   fontWeight: 700,
                 }}
               >
-                🚪 Logout
+                Logout
               </button>
             )}
-            <div>Press the arrow to collapse</div>
           </div>
         )}
       </aside>
 
-      {/* Inline styles for hover & responsive behaviour */}
       <style>{`
         .sidebar-link:hover { background: rgba(20,184,166,.08); }
         @media (max-width: 1024px) {
