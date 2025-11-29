@@ -10,8 +10,7 @@ import Timetable from "./pages/Timetable";
 import Notices from "./pages/Notices";
 import Profile from "./pages/Profile";
 import Assignments from "./pages/Assignments";
-
-import LoginPage from "./pages/Loginpage.jsx";
+import LoginPage from "./pages/LoginPage";
 
 
 // TEACHER FILES
