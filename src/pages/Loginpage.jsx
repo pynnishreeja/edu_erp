@@ -1,188 +1,247 @@
 import React, { useState } from "react";
 
-export default function LoginPage({ onLogin }) {
-  const [role, setRole] = useState("student");
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+export default function LoginPage({ onLogin = () => {} }) {
+const [email, setEmail] = useState("");
+const [password, setPassword] = useState("");
+const [role, setRole] = useState("student");
+const [error, setError] = useState("");
 
-  // CAPTCHA
-  const generateCaptcha = () => {
-    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-    let c = "";
-    for (let i = 0; i < 6; i++) c += chars[Math.floor(Math.random() * chars.length)];
-    return c;
-  };
+const createCaptcha = () => {
+const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+let text = "";
+for (let i = 0; i < 6; i++) {
+text += chars[Math.floor(Math.random() * chars.length)];
+}
+return text;
+};
 
-  const [captcha, setCaptcha] = useState(generateCaptcha());
-  const [captchaInput, setCaptchaInput] = useState("");
-  const [captchaError, setCaptchaError] = useState("");
+const [captcha, setCaptcha] = useState(createCaptcha());
+const [captchaInput, setCaptchaInput] = useState("");
 
-  const handleLogin = () => {
-    // CAPTCHA validation
-    if (captchaInput.trim().toUpperCase() !== captcha) {
-      setCaptchaError("Captcha didn't match. Try again!");
-      setCaptcha(generateCaptcha());
-      setCaptchaInput("");
-      return;
-    }
+const refreshCaptcha = () => {
+setCaptcha(createCaptcha());
+setCaptchaInput("");
+};
 
-    // Clear error if matched
-    setCaptchaError("");
+const handleSubmit = (e) => {
+e.preventDefault();
 
-    // YOUR login logic (dummy login)
-    if (role === "student") {
-      onLogin({ role: "student" });
-    } else if (role === "teacher") {
-      onLogin({ role: "teacher" });
-    }
-  };
 
-  return (
-    <div
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        background: "linear-gradient(135deg, #4f46e5, #14b8a6)",
-        fontFamily: "Inter",
-        padding: 20,
-      }}
-    >
-      <div
+const cleanEmail = email.trim().toLowerCase();
+const cleanPassword = password.trim();
+
+if (captchaInput.trim().toUpperCase() !== captcha) {
+  setError("Captcha did not match. Try again!");
+  refreshCaptcha();
+  return;
+}
+
+setError("");
+
+// STUDENT
+if (
+  role === "student" &&
+  cleanEmail === "student@example.com" &&
+  cleanPassword === "student123"
+) {
+  const user = { role: "student", name: "John Smith" };
+  localStorage.setItem("erpUser", JSON.stringify(user));
+  onLogin(user);
+  return;
+}
+
+// TEACHER
+if (
+  role === "teacher" &&
+  cleanEmail === "teacher@example.com" &&
+  cleanPassword === "teacher123"
+) {
+  const user = { role: "teacher", name: "Prof Williams" };
+  localStorage.setItem("erpUser", JSON.stringify(user));
+  onLogin(user);
+  return;
+}
+
+// ADMIN
+if (
+  role === "admin" &&
+  cleanEmail === "admin@gmail.com" &&
+  cleanPassword === "admin123"
+) {
+  const user = { role: "admin", name: "Admin User" };
+  localStorage.setItem("erpUser", JSON.stringify(user));
+  onLogin(user);
+  return;
+}
+
+setError("Invalid email or password.");
+refreshCaptcha();
+
+
+};
+
+return (
+<div
+style={{
+display: "flex",
+justifyContent: "center",
+alignItems: "center",
+height: "100vh",
+background: "linear-gradient(135deg, #dbeafe, #ffffff)",
+}}
+>
+<div
+style={{
+background: "#fff",
+padding: 40,
+width: 360,
+borderRadius: 12,
+boxShadow: "0 6px 18px rgba(0,0,0,0.1)",
+}}
+>
+<h2 style={{ textAlign: "center", marginBottom: 20 }}>
+ERP Login </h2>
+
+```
+    {error && (
+      <p style={{ color: "red", marginBottom: 12, textAlign: "center" }}>
+        {error}
+      </p>
+    )}
+
+    <form onSubmit={handleSubmit}>
+      <label style={{ fontSize: 14, fontWeight: 600 }}>
+        Login As:
+      </label>
+
+      <select
+        value={role}
+        onChange={(e) => setRole(e.target.value)}
         style={{
-          background: "#ffffff",
-          padding: 30,
-          borderRadius: 16,
-          width: "min(380px, 90vw)",
-          boxShadow: "0 10px 30px rgba(0,0,0,0.15)",
+          width: "100%",
+          padding: 10,
+          marginBottom: 15,
+          borderRadius: 6,
+          border: "1px solid #ccc",
         }}
       >
-        <h2 style={{ fontWeight: 800, marginBottom: 20, textAlign: "center" }}>
-          ERP Login
-        </h2>
+        <option value="student">Student</option>
+        <option value="teacher">Teacher</option>
+        <option value="admin">Admin</option>
+      </select>
 
-        {/* Select Role */}
-        <select
+      <input
+        type="email"
+        placeholder="Enter Email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        required
+        style={{
+          width: "100%",
+          padding: 12,
+          marginBottom: 10,
+          borderRadius: 6,
+          border: "1px solid #ccc",
+        }}
+      />
+
+      <input
+        type="password"
+        placeholder="Enter Password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        required
+        style={{
+          width: "100%",
+          padding: 12,
+          marginBottom: 10,
+          borderRadius: 6,
+          border: "1px solid #ccc",
+        }}
+      />
+
+      <div style={{ marginBottom: 15 }}>
+        <div
           style={{
-            width: "100%",
-            padding: 12,
-            marginBottom: 12,
-            borderRadius: 10,
-            border: "1px solid #e5e7eb",
+            display: "flex",
+            justifyContent: "space-between",
+            marginBottom: 8,
           }}
-          value={role}
-          onChange={(e) => setRole(e.target.value)}
         >
-          <option value="student">Student Login</option>
-          <option value="teacher">Teacher Login</option>
-        </select>
-
-        <input
-          style={{
-            width: "100%",
-            padding: 12,
-            marginBottom: 12,
-            borderRadius: 10,
-            border: "1px solid #e5e7eb",
-          }}
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
-
-        <input
-          type="password"
-          style={{
-            width: "100%",
-            padding: 12,
-            marginBottom: 12,
-            borderRadius: 10,
-            border: "1px solid #e5e7eb",
-          }}
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-
-        {/* CAPTCHA */}
-        <div style={{ marginBottom: 10 }}>
           <div
             style={{
-              display: "flex",
-              justifyContent: "space-between",
-              marginBottom: 8,
-              alignItems: "center",
+              fontSize: 26,
+              letterSpacing: 4,
+              fontWeight: "bold",
+              background: "#f3f4f6",
+              padding: "10px 14px",
+              borderRadius: 6,
+              border: "1px solid #ccc",
+              userSelect: "none",
+              fontFamily: "monospace",
             }}
           >
-            <div
-              style={{
-                fontSize: 28,
-                fontWeight: 900,
-                letterSpacing: 4,
-                background: "#f1f5f9",
-                padding: "8px 12px",
-                borderRadius: 10,
-                border: "1px solid #e5e7eb",
-                userSelect: "none",
-                fontFamily: "monospace",
-              }}
-            >
-              {captcha}
-            </div>
-
-            <button
-              onClick={() => setCaptcha(generateCaptcha())}
-              style={{
-                background: "#4f46e5",
-                color: "#fff",
-                padding: "8px 12px",
-                borderRadius: 10,
-                border: "none",
-                cursor: "pointer",
-                fontWeight: 700,
-              }}
-            >
-              Refresh
-            </button>
+            {captcha}
           </div>
 
-          <input
-            placeholder="Enter Captcha"
-            value={captchaInput}
-            onChange={(e) => setCaptchaInput(e.target.value)}
+          <button
+            type="button"
+            onClick={refreshCaptcha}
             style={{
-              width: "100%",
-              padding: 10,
-              borderRadius: 10,
-              border: "1px solid #e5e7eb",
+              background: "#1e3a8a",
+              color: "#fff",
+              padding: "10px 12px",
+              borderRadius: 6,
+              border: "none",
+              cursor: "pointer",
+              fontWeight: 700,
             }}
-          />
-
-          {captchaError && (
-            <div style={{ color: "red", marginTop: 6, fontSize: 14 }}>
-              {captchaError}
-            </div>
-          )}
+          >
+            Refresh
+          </button>
         </div>
 
-        <button
-          onClick={handleLogin}
+        <input
+          type="text"
+          placeholder="Enter Captcha"
+          value={captchaInput}
+          onChange={(e) => setCaptchaInput(e.target.value)}
+          required
           style={{
             width: "100%",
-            padding: 12,
-            background: "linear-gradient(90deg,#4f46e5,#14b8a6)",
-            color: "#fff",
-            border: "none",
-            borderRadius: 10,
-            cursor: "pointer",
-            fontWeight: 800,
-            marginTop: 10,
+            padding: 10,
+            borderRadius: 6,
+            border: "1px solid #ccc",
           }}
-        >
-          Login
-        </button>
+        />
       </div>
-    </div>
-  );
+
+      <button
+        type="submit"
+        style={{
+          width: "100%",
+          padding: 12,
+          marginTop: 10,
+          background: "#1e3a8a",
+          color: "#fff",
+          fontWeight: 700,
+          border: "none",
+          borderRadius: 6,
+          cursor: "pointer",
+        }}
+      >
+        Login
+      </button>
+    </form>
+
+    <p style={{ marginTop: 20, fontSize: 14, color: "#555" }}>
+      Student → <b>student@example.com / student123</b> <br />
+      Teacher → <b>teacher@example.com / teacher123</b> <br />
+      Admin → <b>admin@gmail.com / admin123</b>
+    </p>
+  </div>
+</div>
+
+
+);
 }
